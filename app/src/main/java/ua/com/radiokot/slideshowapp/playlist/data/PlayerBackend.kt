@@ -10,7 +10,7 @@ interface PlayerBackend {
      */
     suspend fun getPlaylistItems(
         screenKey: String,
-    ): List<PlaylistItemsResponse>
+    ): PlaylistItemsResponse
 
     /**
      * @return a creative content streaming channel.

@@ -1,5 +1,7 @@
 package ua.com.radiokot.slideshowapp.playlist.domain
 
+import kotlinx.coroutines.flow.Flow
+
 interface PlaylistRepository {
 
     /**
@@ -9,4 +11,9 @@ interface PlaylistRepository {
     suspend fun getReadyPlaylist(
         key: String,
     ): Playlist?
+
+    /**
+     * @return a flow of most recent playlists.
+     */
+    fun getPlaylistsFlow(): Flow<List<Playlist>>
 }

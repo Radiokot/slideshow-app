@@ -3,7 +3,9 @@ package ua.com.radiokot.slideshowapp.playlist
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.koin.dsl.bind
 import org.koin.dsl.module
+import ua.com.radiokot.slideshowapp.creative.creativeModule
 import ua.com.radiokot.slideshowapp.io.ioModule
+import ua.com.radiokot.slideshowapp.playlist.data.CachedPlaylistRepository
 import ua.com.radiokot.slideshowapp.playlist.data.KtorPlayerBackend
 import ua.com.radiokot.slideshowapp.playlist.data.PlayerBackend
 import ua.com.radiokot.slideshowapp.playlist.domain.Playlist
@@ -13,6 +15,7 @@ val playlistModule = module {
 
     includes(
         ioModule,
+        creativeModule,
     )
 
     single {
@@ -23,10 +26,9 @@ val playlistModule = module {
     } bind PlayerBackend::class
 
     single {
-        // TODO provide actual impl
-        object : PlaylistRepository {
-            override suspend fun getReadyPlaylist(key: String): Playlist =
-                Playlist()
-        }
+        CachedPlaylistRepository(
+            screenKey = "7d47b6d7-8294-4b33-8887-066961d79993",
+            playerBackend = get(),
+        )
     } bind PlaylistRepository::class
 }

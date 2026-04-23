@@ -14,7 +14,7 @@ class KtorPlayerBackend(
 
     override suspend fun getPlaylistItems(
         screenKey: String,
-    ): List<PlayerBackend.PlaylistItemsResponse> =
+    ): PlayerBackend.PlaylistItemsResponse =
         client
             .get(
                 urlString =
