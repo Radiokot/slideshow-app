@@ -16,4 +16,11 @@ interface PlaylistRepository {
      * @return a flow of most recent playlists.
      */
     fun getPlaylistsFlow(): Flow<List<Playlist>>
+
+    /**
+     * Sets the given [playlist] as ready to play.
+     */
+    suspend fun setPlaylistReady(
+        playlist: Playlist,
+    )
 }

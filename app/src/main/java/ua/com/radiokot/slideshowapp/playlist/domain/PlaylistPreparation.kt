@@ -1,0 +1,58 @@
+package ua.com.radiokot.slideshowapp.playlist.domain
+
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.launch
+import ua.com.radiokot.slideshowapp.creative.domain.LocalCreativeRepository
+import kotlin.time.Duration.Companion.seconds
+
+class PlaylistPreparation(
+    private val playlistRepository: PlaylistRepository,
+    private val localCreativeRepository: LocalCreativeRepository,
+) {
+    /**
+     * Prepares given [playlist] for playback:
+     * - Saves locally all the creatives that aren't yet saved
+     * - Sets the playlist as ready
+     *
+     * @return `true` if prepared successfully, `false` otherwise
+     */
+    suspend fun preparePlaylist(
+        playlist: Playlist,
+    ): Boolean = runCatching {
+
+        val creativesToSave =
+            playlist
+                .items
+                .map(Playlist.Item::creative)
+                .distinct()
+                .filterNot { it in localCreativeRepository }
+
+        coroutineScope {
+            creativesToSave.forEach { creative ->
+                launch {
+                    var attemptCount = 0
+                    do {
+                        var isSavedSuccessfully = true
+
+                        try {
+                            localCreativeRepository.saveCreativeLocally(creative)
+                        } catch (_: Exception) {
+                            ensureActive()
+                            isSavedSuccessfully = false
+                        }
+
+                        if (!isSavedSuccessfully) {
+                            delay(5.seconds)
+                            attemptCount++
+                        }
+                    } while (!isSavedSuccessfully || attemptCount > 3)
+                }
+            }
+        }
+
+        playlistRepository.setPlaylistReady(playlist)
+
+    }.isSuccess
+}

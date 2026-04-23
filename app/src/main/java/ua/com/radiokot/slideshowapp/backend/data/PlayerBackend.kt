@@ -1,4 +1,4 @@
-package ua.com.radiokot.slideshowapp.playlist.data
+package ua.com.radiokot.slideshowapp.backend.data
 
 import io.ktor.utils.io.ByteReadChannel
 import kotlinx.serialization.Serializable

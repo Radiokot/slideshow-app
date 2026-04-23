@@ -1,4 +1,4 @@
-package ua.com.radiokot.slideshowapp.playlist.data
+package ua.com.radiokot.slideshowapp.backend.data
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body

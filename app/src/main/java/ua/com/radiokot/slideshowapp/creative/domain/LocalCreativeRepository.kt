@@ -1,7 +1,6 @@
 package ua.com.radiokot.slideshowapp.creative.domain
 
 import android.net.Uri
-import io.ktor.utils.io.ByteReadChannel
 
 interface LocalCreativeRepository {
 
@@ -13,11 +12,15 @@ interface LocalCreativeRepository {
         creative: Creative,
     ): Uri?
 
+    suspend operator fun contains(
+        creative: Creative,
+    ): Boolean =
+        getLocalCreativeUri(creative) != null
+
     /**
      * Saves the creative content locally.
      */
     suspend fun saveCreativeLocally(
         creative: Creative,
-        content: ByteReadChannel,
     )
 }

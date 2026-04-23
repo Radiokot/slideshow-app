@@ -3,10 +3,10 @@ package ua.com.radiokot.slideshowapp.creative.data
 import android.net.Uri
 import androidx.core.net.toUri
 import io.ktor.util.cio.writeChannel
-import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.copyTo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import ua.com.radiokot.slideshowapp.backend.data.PlayerBackend
 import ua.com.radiokot.slideshowapp.creative.domain.Creative
 import ua.com.radiokot.slideshowapp.creative.domain.LocalCreativeRepository
 import java.io.File
@@ -16,6 +16,7 @@ import java.io.File
  */
 class FsLocalCreativeRepository(
     private val creativeDirectory: File,
+    private val playerBackend: PlayerBackend,
 ) : LocalCreativeRepository {
     init {
         require(creativeDirectory.exists()) {
@@ -45,15 +46,20 @@ class FsLocalCreativeRepository(
 
     override suspend fun saveCreativeLocally(
         creative: Creative,
-        content: ByteReadChannel,
     ): Unit = withContext(Dispatchers.IO) {
 
-        content.copyTo(
-            channel =
-                getCreativeFile(
-                    creativeKey = creative.key,
-                ).writeChannel(),
+        val outputFile = getCreativeFile(
+            creativeKey = creative.key,
         )
+        try {
+            val content = playerBackend.getCreative(
+                creativeKey = creative.key,
+            )
+            content.copyTo(outputFile.writeChannel())
+        } catch (e: Exception) {
+            outputFile.delete()
+            throw e
+        }
     }
 
     private fun getCreativeFile(
