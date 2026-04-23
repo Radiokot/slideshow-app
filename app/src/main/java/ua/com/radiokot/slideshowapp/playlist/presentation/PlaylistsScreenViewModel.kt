@@ -21,7 +21,7 @@ class PlaylistsScreenViewModel(
 
     val items: StateFlow<ImmutableList<PlaylistScreenItem>> =
         playlistRepository
-            .getPlaylistsFlow()
+            .getMostRecentPlaylistsFlow()
             .map { playlists ->
                 playlists.map { playlist ->
                     PlaylistScreenItem(
