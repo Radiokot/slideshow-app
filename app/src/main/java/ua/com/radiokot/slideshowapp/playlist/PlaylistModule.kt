@@ -1,18 +1,22 @@
 package ua.com.radiokot.slideshowapp.playlist
 
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import ua.com.radiokot.slideshowapp.backend.backendModule
 import ua.com.radiokot.slideshowapp.creative.creativeModule
 import ua.com.radiokot.slideshowapp.database.data.ScreenDatabase
+import ua.com.radiokot.slideshowapp.database.databaseModule
 import ua.com.radiokot.slideshowapp.playlist.data.CachedPlaylistRepository
 import ua.com.radiokot.slideshowapp.playlist.domain.PlaylistPreparation
 import ua.com.radiokot.slideshowapp.playlist.domain.PlaylistRepository
+import ua.com.radiokot.slideshowapp.playlist.presentation.PlaylistsScreenViewModel
 
 val playlistModule = module {
 
     includes(
         backendModule,
+        databaseModule,
         creativeModule,
     )
 
@@ -28,6 +32,13 @@ val playlistModule = module {
         PlaylistPreparation(
             playlistRepository = get(),
             localCreativeRepository = get(),
+        )
+    }
+
+    viewModel {
+        PlaylistsScreenViewModel(
+            screenKey = "7d47b6d7-8294-4b33-8887-066961d79993",
+            playlistRepository = get(),
         )
     }
 }

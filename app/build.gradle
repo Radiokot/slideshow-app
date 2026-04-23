@@ -2,6 +2,7 @@ plugins {
     id "com.android.application"
     id "org.jetbrains.kotlin.android"
     id "org.jetbrains.kotlin.plugin.compose"
+    id "org.jetbrains.kotlin.plugin.serialization"
     id "com.google.devtools.ksp"
     id "androidx.room"
 }
@@ -72,7 +73,7 @@ dependencies {
     implementation "androidx.media3:media3-exoplayer:$exoplayerVersion"
     implementation "androidx.media3:media3-ui-compose:$exoplayerVersion"
 
-    def ktorVersion = "2.3.4"
+    def ktorVersion = "3.4.3"
     implementation "io.ktor:ktor-client-core:$ktorVersion"
     implementation "io.ktor:ktor-client-okhttp:$ktorVersion"
     implementation "io.ktor:ktor-client-content-negotiation:$ktorVersion"

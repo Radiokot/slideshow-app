@@ -36,7 +36,7 @@ interface PlayerBackend {
         val creativeKey: String,
         val duration: Int,
         val modified: Long,
-        val creativeProperties: String?,
+        val creativeProperties: String? = null,
         val orderKey: Int,
     )
     // endregion Models

@@ -1,8 +1,16 @@
 package ua.com.radiokot.slideshowapp.playlist.data
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.onSubscription
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.launch
 import ua.com.radiokot.slideshowapp.backend.data.PlayerBackend
 import ua.com.radiokot.slideshowapp.backend.data.toPlaylists
 import ua.com.radiokot.slideshowapp.database.data.PlaylistDao
@@ -17,6 +25,8 @@ class CachedPlaylistRepository(
     private val playlistDao: PlaylistDao,
 ) : PlaylistRepository {
 
+    private val coroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
     override suspend fun getReadyPlaylist(
         key: String,
     ): Playlist? =
@@ -26,11 +36,11 @@ class CachedPlaylistRepository(
             )
             ?.let(PlaylistDbEntity::toPlaylist)
 
-    override fun getMostRecentPlaylistsFlow(): Flow<List<Playlist>> =
+    private val sharedMostRecentPlaylistsFlow: SharedFlow<List<Playlist>> =
         playlistDao
             .selectAllPlaylistsFlow()
-            .map { playlists ->
-                playlists
+            .map { dbEntities ->
+                dbEntities
                     .groupBy(PlaylistDbEntity::key)
                     .map { (_, playlistVersions) ->
                         playlistVersions
@@ -38,8 +48,18 @@ class CachedPlaylistRepository(
                             .toPlaylist()
                     }
             }
-            .onStart {
-                updatePlaylistsFromBackend()
+            .shareIn(coroutineScope, SharingStarted.Eagerly, replay = 1)
+
+    private var updateFromBackendJob: Job? = null
+
+    override fun getMostRecentPlaylistsFlow(): Flow<List<Playlist>> =
+        sharedMostRecentPlaylistsFlow
+            .onSubscription {
+                if (updateFromBackendJob?.isActive != true) {
+                    updateFromBackendJob = coroutineScope.launch {
+                        updatePlaylistsFromBackend()
+                    }
+                }
             }
 
     override suspend fun setPlaylistReady(
@@ -61,6 +81,7 @@ class CachedPlaylistRepository(
             playerBackend
                 .getPlaylistItems(screenKey)
                 .toPlaylists()
+
         val backendPlaylistKeys =
             backendPlaylists
                 .mapTo(mutableSetOf(), Playlist::key)
