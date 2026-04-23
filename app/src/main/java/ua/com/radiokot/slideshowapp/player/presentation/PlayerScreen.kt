@@ -1,10 +1,15 @@
+@file:OptIn(UnstableApi::class)
+
 package ua.com.radiokot.slideshowapp.player.presentation
 
+import androidx.annotation.OptIn
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.BasicText
@@ -24,6 +29,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.compose.ContentFrame
 import androidx.media3.ui.compose.SURFACE_TYPE_TEXTURE_VIEW
@@ -36,6 +43,7 @@ import kotlinx.coroutines.isActive
 fun PlayerScreen(
     modifier: Modifier = Modifier,
     itemState: State<PlayerItem?>,
+    onSkipCurrentItemAction: () -> Unit,
 ) = Box(
     modifier = modifier,
 ) {
@@ -43,14 +51,24 @@ fun PlayerScreen(
         targetState = itemState.value,
         transitionSpec = {
             ContentTransform(
-                targetContentEnter = fadeIn(),
-                initialContentExit = fadeOut(),
+                targetContentEnter = fadeIn(
+                    animationSpec = tween(750),
+                ),
+                initialContentExit = fadeOut(
+                    animationSpec = tween(750),
+                ),
                 sizeTransform = null,
             )
         },
         contentKey = { it?.key },
         modifier = Modifier
             .fillMaxSize()
+            .combinedClickable(
+                onClick = {},
+                onLongClick = onSkipCurrentItemAction,
+                interactionSource = null,
+                indication = null,
+            )
     ) { playerItem ->
 
         if (playerItem == null) {
@@ -117,13 +135,27 @@ private fun VideoPlayer(
 ) {
     val context = LocalContext.current
     val player = remember {
-        ExoPlayer.Builder(context).build().apply {
-            repeatMode = Player.REPEAT_MODE_ONE
-            playWhenReady = true
-        }
+        ExoPlayer.Builder(context)
+            .setLoadControl(
+                // Small buffer for local playback.
+                DefaultLoadControl.Builder()
+                    .setBufferDurationsMs(
+                        100,
+                        100,
+                        100,
+                        100,
+                    )
+                    .build()
+            )
+            .build()
+            .apply {
+                repeatMode = Player.REPEAT_MODE_ONE
+                playWhenReady = true
+            }
     }
     LaunchedEffect(content) {
         with(player) {
+            stop()
             setMediaItem(MediaItem.fromUri(content.uri))
             volume = content.volumePercent / 100f
             prepare()
@@ -173,6 +205,7 @@ private fun PlayerScreenPreview() {
 
     PlayerScreen(
         itemState = itemState,
+        onSkipCurrentItemAction = {},
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
