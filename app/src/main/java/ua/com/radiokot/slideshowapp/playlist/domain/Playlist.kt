@@ -15,12 +15,15 @@ class Playlist(
         if (other !is Playlist) return false
 
         if (key != other.key) return false
+        if (lastModified != other.lastModified) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        return key.hashCode()
+        var result = key.hashCode()
+        result = 31 * result + lastModified.hashCode()
+        return result
     }
 
     override fun toString(): String {

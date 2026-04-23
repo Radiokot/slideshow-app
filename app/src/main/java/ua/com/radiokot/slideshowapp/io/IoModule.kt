@@ -1,5 +1,8 @@
 package ua.com.radiokot.slideshowapp.io
 
+import com.skydoves.landscapist.core.Landscapist
+import com.skydoves.landscapist.core.LandscapistConfig
+import com.skydoves.landscapist.core.fetcher.AndroidFetchers
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -37,4 +40,15 @@ val ioModule = module {
             }
         }
     } bind HttpClient::class
+
+    single<Landscapist> {
+        val config = LandscapistConfig(
+            diskCacheSize = 0L,
+        )
+
+        Landscapist.Builder()
+            .config(config)
+            .fetcher(AndroidFetchers.createDefault(config.networkConfig))
+            .build()
+    } bind Landscapist::class
 }

@@ -39,9 +39,6 @@ class MainActivity : ComponentActivity() {
                 onSignOutAction = {},
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color(0xffda1d52))
-                    .safeContentPadding()
-                    .padding(24.dp)
             )
         }
     }

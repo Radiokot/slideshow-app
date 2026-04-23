@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicText
@@ -42,7 +43,10 @@ fun PlaylistsScreen(
     onItemClickAction: (PlaylistScreenItem) -> Unit,
     onSignOutAction: () -> Unit,
 ) = Column(
-    modifier = modifier,
+    modifier = modifier
+        .background(Color(0xffda1d52))
+        .safeContentPadding()
+        .padding(24.dp),
 ) {
     Row {
         Column(
@@ -162,9 +166,7 @@ fun PlaylistsScreen(
 private fun PlaylistsScreenPreview() {
     PlaylistsScreen(
         modifier = Modifier
-            .background(Color(0xffda1d52))
-            .fillMaxSize()
-            .padding(24.dp),
+            .fillMaxSize(),
         screenKey = "19ce0ec4-320c-4b52-b02a-01c4fc1a91f3",
         itemsState =
             persistentListOf(
@@ -177,6 +179,7 @@ private fun PlaylistsScreenPreview() {
                     key = "test2",
                 ),
             ).let(::mutableStateOf),
-        onItemClickAction = {}
-    ) {}
+        onItemClickAction = {},
+        onSignOutAction = {},
+    )
 }

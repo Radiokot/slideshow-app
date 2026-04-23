@@ -18,6 +18,14 @@ interface PlaylistRepository {
     fun getMostRecentPlaylistsFlow(): Flow<List<Playlist>>
 
     /**
+     * @return most recent playlist with the given [key],
+     * `null` if there's no such playlist.
+     */
+    suspend fun getMostRecentPlaylist(
+        key: String,
+    ): Playlist?
+
+    /**
      * Sets the given [playlist] as ready to play.
      */
     suspend fun setPlaylistReady(

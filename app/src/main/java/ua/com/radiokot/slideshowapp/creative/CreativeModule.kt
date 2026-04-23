@@ -18,7 +18,7 @@ val creativeModule = module {
         FsLocalCreativeRepository(
             playerBackend = get(),
             creativeDirectory = File(
-                androidContext().noBackupFilesDir,
+                androidContext().cacheDir,
                 "Creatives"
             ),
         )
