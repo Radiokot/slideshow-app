@@ -5,4 +5,9 @@
         <item name="android:enforceNavigationBarContrast" tools:targetApi="29">false</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
+
+    <style name="PlayerTheme" parent="SlideshowAppTheme">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
 </resources>
