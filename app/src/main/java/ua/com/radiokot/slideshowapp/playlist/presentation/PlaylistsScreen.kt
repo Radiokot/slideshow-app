@@ -40,7 +40,7 @@ fun PlaylistsScreen(
     modifier: Modifier = Modifier,
     screenKey: String,
     itemsState: State<ImmutableList<PlaylistScreenItem>>,
-    onItemClickAction: (PlaylistScreenItem) -> Unit,
+    onItemClick: (PlaylistScreenItem) -> Unit,
     onSignOutAction: () -> Unit,
 ) = Column(
     modifier = modifier
@@ -131,7 +131,7 @@ fun PlaylistsScreen(
                     )
                     .clickable(
                         onClick = {
-                            onItemClickAction(item)
+                            onItemClick(item)
                         },
                     )
                     .padding(16.dp)
@@ -179,7 +179,7 @@ private fun PlaylistsScreenPreview() {
                     key = "test2",
                 ),
             ).let(::mutableStateOf),
-        onItemClickAction = {},
+        onItemClick = {},
         onSignOutAction = {},
     )
 }

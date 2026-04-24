@@ -12,10 +12,10 @@ interface PlaylistDao {
     @Query("SELECT * FROM playlists")
     fun selectAllPlaylistsFlow(): Flow<List<PlaylistDbEntity>>
 
-    @Query("UPDATE playlists SET is_ready=1 WHERE `key`=:key AND `last_modified`=:lastModified")
+    @Query("UPDATE playlists SET is_ready=1 WHERE `key`=:key AND `last_modified`=:lastModifiedMs")
     suspend fun setPlaylistReady(
         key: String,
-        lastModified: Long,
+        lastModifiedMs: Long,
     )
 
     @Insert(

@@ -27,7 +27,8 @@ class PlayerActivity : ComponentActivity() {
             val viewModel: PlayerScreenViewModel = koinViewModel {
                 parametersOf(
                     PlayerScreenViewModel.Parameters(
-                        playlistKey = "1",
+                        playlistKey = intent.getStringExtra(PLAYLIST_KEY_EXTRA)
+                            ?: error("No $PLAYLIST_KEY_EXTRA extra passed"),
                     )
                 )
             }
@@ -42,5 +43,15 @@ class PlayerActivity : ComponentActivity() {
 
         WindowInsetsControllerCompat(window, window.decorView)
             .hide(WindowInsetsCompat.Type.systemBars())
+    }
+
+    companion object {
+        private const val PLAYLIST_KEY_EXTRA = "playlist_key"
+
+        fun getBundle(
+            playlistKey: String,
+        ) = Bundle().apply {
+            putString(PLAYLIST_KEY_EXTRA, playlistKey)
+        }
     }
 }

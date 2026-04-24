@@ -1,6 +1,7 @@
 package ua.com.radiokot.slideshowapp.creative
 
 import org.koin.android.ext.koin.androidContext
+import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import ua.com.radiokot.slideshowapp.backend.backendModule
@@ -14,13 +15,23 @@ val creativeModule = module {
         backendModule,
     )
 
+    single(named(DIRECTORY_CREATIVES)) {
+        File(
+            androidContext().cacheDir,
+            "Creatives"
+        ).apply {
+            if (!exists()) {
+                mkdirs()
+            }
+        }
+    }
+
     single {
         FsLocalCreativeRepository(
             playerBackend = get(),
-            creativeDirectory = File(
-                androidContext().cacheDir,
-                "Creatives"
-            ),
+            creativeDirectory = get(named(DIRECTORY_CREATIVES)),
         )
     } bind LocalCreativeRepository::class
 }
+
+const val DIRECTORY_CREATIVES = "creatives"

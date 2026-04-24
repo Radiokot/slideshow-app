@@ -73,8 +73,9 @@ class CachedPlaylistRepository(
     override suspend fun setPlaylistReady(
         playlist: Playlist,
     ) {
-        playlistDao.selectReadyToPlayPlaylist(
+        playlistDao.setPlaylistReady(
             key = playlist.key,
+            lastModifiedMs = playlist.lastModified.toEpochMilli(),
         )
     }
 
