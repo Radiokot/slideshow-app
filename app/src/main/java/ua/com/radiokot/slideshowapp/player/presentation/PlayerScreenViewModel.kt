@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
@@ -117,6 +118,10 @@ class PlayerScreenViewModel(
                 .items
                 .sortedBy(Playlist.Item::orderKey)
 
+        if (playlistItems.isEmpty()) {
+            return flowOf(null)
+        }
+
         val playerItems =
             playlistItems
                 .map { item ->
@@ -146,7 +151,7 @@ class PlayerScreenViewModel(
         return flow {
             var currentItemIndex = 0
             do {
-                val currentItem = playerItems.getOrNull(currentItemIndex)
+                val currentItem = playerItems[currentItemIndex]
                 emit(currentItem)
 
                 // Wait either for the presentation to finish
