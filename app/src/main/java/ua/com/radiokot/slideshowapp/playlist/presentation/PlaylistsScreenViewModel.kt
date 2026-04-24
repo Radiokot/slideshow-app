@@ -18,6 +18,7 @@ import kotlinx.coroutines.runBlocking
 import ua.com.radiokot.slideshowapp.playlist.domain.PlaylistRepository
 import ua.com.radiokot.slideshowapp.session.domain.SignOutUseCase
 import ua.com.radiokot.slideshowapp.util.eventSharedFlow
+import ua.com.radiokot.slideshowapp.util.lazyLogger
 import java.time.ZoneId
 
 @Immutable
@@ -27,6 +28,7 @@ class PlaylistsScreenViewModel(
     private val playlistRepository: PlaylistRepository,
 ) : ViewModel() {
 
+    private val log by lazyLogger("PlaylistsScreenVM")
     private val _events: MutableSharedFlow<Event> = eventSharedFlow()
     val events: SharedFlow<Event> = _events
 
@@ -58,12 +60,22 @@ class PlaylistsScreenViewModel(
         } ?: return
 
         if (playlist.isReadyToPlay) {
+            log.debug {
+                "onItemClick(): playlist is ready, proceeding to player:" +
+                        "\nplaylist=$playlist"
+            }
+
             _events.tryEmit(
                 Event.ProceedToPlayer(
                     playlistKey = playlist.key,
                 )
             )
         } else {
+            log.debug {
+                "onItemClick(): playlist is not ready, proceeding to preparation:" +
+                        "\nplaylist=$playlist"
+            }
+
             _events.tryEmit(
                 Event.ProceedToPlaylistPreparation(
                     playlistKey = playlist.key,

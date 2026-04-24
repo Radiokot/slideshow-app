@@ -22,6 +22,7 @@ import ua.com.radiokot.slideshowapp.database.data.PlaylistDbEntity
 import ua.com.radiokot.slideshowapp.database.data.toPlaylist
 import ua.com.radiokot.slideshowapp.playlist.domain.Playlist
 import ua.com.radiokot.slideshowapp.playlist.domain.PlaylistRepository
+import ua.com.radiokot.slideshowapp.util.lazyLogger
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -32,6 +33,7 @@ class CachedPlaylistRepository(
     private val periodicBackendUpdateInterval: Duration,
 ) : PlaylistRepository {
 
+    private val log by lazyLogger("CachedPlaylistRepo")
     private val coroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     override suspend fun getReadyPlaylist(
@@ -59,13 +61,35 @@ class CachedPlaylistRepository(
             }
             .onStart {
                 periodicBackendUpdatesJob = coroutineScope.launch {
+                    log.debug {
+                        "mostRecentPlaylistsFlowWithUpdates: starting periodic updates from backend:" +
+                                "\ninterval=$periodicBackendUpdateInterval"
+                    }
+
                     do {
                         updatePlaylistsFromBackend()
+                            .onFailure { error ->
+                                log.error(error) {
+                                    "mostRecentPlaylistsFlowWithUpdates: update failed"
+                                }
+                            }
+                            .onSuccess {
+                                log.debug {
+                                    "mostRecentPlaylistsFlowWithUpdates: successfully updated"
+                                }
+                                log.info {
+                                    "Playlists successfully updated from the backend"
+                                }
+                            }
                         delay(periodicBackendUpdateInterval)
                     } while (isActive)
                 }
             }
             .onCompletion {
+                log.debug {
+                    "mostRecentPlaylistsFlowWithUpdates: stopping periodic updates from backend"
+                }
+
                 periodicBackendUpdatesJob?.cancel()
             }
             .shareIn(

@@ -13,6 +13,7 @@ This is a [test assignment](https://github.com/vladimir-nvs/slideshow-task-andro
 - Ktor + OkHTTP + Kotlin JSON serialization for networking
 - ExoPlayer for video playback
 - Landscapist for showing images
+- kotlin-logging + logback-android for logging
 
 ## Key points
 
@@ -22,6 +23,7 @@ This is a [test assignment](https://github.com/vladimir-nvs/slideshow-task-andro
 - The app stores multiple versions of the same playlist but only plays the most recent version that is ready to play
 - A playlist is ready to play once it has been prepared successfully, so all its media files (creatives) are downloaded (see `PlaylistPreparation`)
 - When the playlist is playing, the user can skip the current item by a long press
+- App logs are printed with the `SA:` tag prefix. Debug build type has the most verbose logs
 
 ## Build tools
 

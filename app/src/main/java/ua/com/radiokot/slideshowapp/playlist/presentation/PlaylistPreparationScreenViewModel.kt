@@ -8,6 +8,7 @@ import kotlinx.coroutines.launch
 import ua.com.radiokot.slideshowapp.playlist.domain.PlaylistPreparation
 import ua.com.radiokot.slideshowapp.playlist.domain.PlaylistRepository
 import ua.com.radiokot.slideshowapp.util.eventSharedFlow
+import ua.com.radiokot.slideshowapp.util.lazyLogger
 
 class PlaylistPreparationScreenViewModel(
     private val playlistRepository: PlaylistRepository,
@@ -15,6 +16,7 @@ class PlaylistPreparationScreenViewModel(
     private val parameters: Parameters,
 ) : ViewModel() {
 
+    private val log by lazyLogger("PlaylistPreparationScreenVM")
     private val _events: MutableSharedFlow<Event> = eventSharedFlow()
     val events: SharedFlow<Event> = _events
 
@@ -36,6 +38,13 @@ class PlaylistPreparationScreenViewModel(
             val isPreparedSuccessfully = playlistPreparation.preparePlaylist(mostRecentPlaylist)
 
             if (isPreparedSuccessfully) {
+                log.debug {
+                    "init(): prepared successfully, proceeding to player"
+                }
+                log.info {
+                    "Playlist ${mostRecentPlaylist.key} prepared"
+                }
+
                 _events.emit(
                     Event.ProceedToPlayer(
                         playlistKey = mostRecentPlaylist.key,
@@ -43,6 +52,15 @@ class PlaylistPreparationScreenViewModel(
                     )
                 )
             } else if (readyPlaylist != null) {
+                log.debug {
+                    "init(): preparation failed, proceeding to player with the ready version:" +
+                            "\nreadyPlaylist=$readyPlaylist"
+                }
+                log.info {
+                    "Older version of the playlist ${mostRecentPlaylist.key} will be played," +
+                            "as its preparation failed"
+                }
+
                 _events.emit(
                     Event.ProceedToPlayer(
                         playlistKey = mostRecentPlaylist.key,
@@ -50,6 +68,13 @@ class PlaylistPreparationScreenViewModel(
                     )
                 )
             } else {
+                log.debug {
+                    "init(): preparation failed, no ready playlist version found, emitting failure"
+                }
+                log.info {
+                    "Playlist ${mostRecentPlaylist.key} preparation failed, no ready version found"
+                }
+
                 _events.emit(Event.PreparationFailed)
             }
         }

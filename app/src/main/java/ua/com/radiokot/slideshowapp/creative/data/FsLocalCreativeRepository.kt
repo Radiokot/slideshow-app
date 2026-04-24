@@ -5,10 +5,12 @@ import androidx.core.net.toUri
 import io.ktor.util.cio.writeChannel
 import io.ktor.utils.io.copyTo
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import ua.com.radiokot.slideshowapp.backend.data.PlayerBackend
 import ua.com.radiokot.slideshowapp.creative.domain.Creative
 import ua.com.radiokot.slideshowapp.creative.domain.LocalCreativeRepository
+import ua.com.radiokot.slideshowapp.util.lazyLogger
 import java.io.File
 
 /**
@@ -18,6 +20,9 @@ class FsLocalCreativeRepository(
     private val creativeDirectory: File,
     private val playerBackend: PlayerBackend,
 ) : LocalCreativeRepository {
+
+    private val log by lazyLogger("FsLocalCreativeRepo")
+
     init {
         require(creativeDirectory.exists()) {
             "Provided file doesn't exist: $creativeDirectory"
@@ -50,6 +55,11 @@ class FsLocalCreativeRepository(
         creative: Creative,
     ): Unit = withContext(Dispatchers.IO) {
 
+        log.debug {
+            "saveCreativeLocally(): saving:" +
+                    "\ncreative=$creative"
+        }
+
         val outputFile = getCreativeFile(
             creativeKey = creative.key,
         )
@@ -58,8 +68,21 @@ class FsLocalCreativeRepository(
                 creativeKey = creative.key,
             )
             content.copyTo(outputFile.writeChannel())
+
+            log.debug {
+                "saveCreativeLocally(): saved:" +
+                        "\ncreative=$creative" +
+                        "\noutputFile=${outputFile.absolutePath}"
+            }
         } catch (e: Exception) {
             outputFile.delete()
+            ensureActive()
+
+            log.error(e) {
+                "saveCreativeLocally(): failed saving:" +
+                        "\ncreative=$creative"
+            }
+
             throw e
         }
     }

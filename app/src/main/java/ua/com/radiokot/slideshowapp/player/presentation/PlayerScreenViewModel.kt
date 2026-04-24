@@ -27,6 +27,7 @@ import ua.com.radiokot.slideshowapp.playlist.domain.Playlist
 import ua.com.radiokot.slideshowapp.playlist.domain.PlaylistPreparation
 import ua.com.radiokot.slideshowapp.playlist.domain.PlaylistRepository
 import ua.com.radiokot.slideshowapp.util.coroutineScopeThatCancelsWith
+import ua.com.radiokot.slideshowapp.util.lazyLogger
 
 @Immutable
 class PlayerScreenViewModel(
@@ -35,6 +36,8 @@ class PlayerScreenViewModel(
     private val playlistPreparation: PlaylistPreparation,
     private val parameters: Parameters,
 ) : ViewModel() {
+
+    private val log by lazyLogger("PlayerScreenVM")
 
     private val playlist: MutableStateFlow<Playlist> = runBlocking {
         MutableStateFlow(
@@ -52,7 +55,18 @@ class PlayerScreenViewModel(
 
     val playerItem: StateFlow<PlayerItem?> = runBlocking {
         playlist
+            .onEach { playlist ->
+                log.info {
+                    "Playing playlist ${playlist.key} last modified ${playlist.lastModified}"
+                }
+            }
             .flatMapLatest(::createPlayerItemFlow)
+            .onEach {
+                log.debug {
+                    "playerItem: switching item:" +
+                            "\nitem=$it"
+                }
+            }
             .stateIn(coroutineScopeThatCancelsWith(viewModelScope))
     }
 
@@ -70,8 +84,22 @@ class PlayerScreenViewModel(
                 }
 
                 if (newerVersion != null) {
+                    log.debug {
+                        "init(): preparing newer version of the playlist:" +
+                                "\nnewerVersion=$newerVersion"
+                    }
+                    log.info {
+                        "Found newer version of the playlist, last modified ${newerVersion.lastModified}"
+                    }
+
                     val isPreparedSuccessfully =
                         playlistPreparation.preparePlaylist(newerVersion)
+
+                    log.debug {
+                        "init(): done preparing newer version of the playlist:" +
+                                "\nisPreparedSuccessfully=$isPreparedSuccessfully"
+                    }
+
                     if (isPreparedSuccessfully) {
                         playlist.value = newerVersion
                     }

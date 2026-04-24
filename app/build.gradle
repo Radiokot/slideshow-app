@@ -26,6 +26,7 @@ android {
 
     buildFeatures {
         compose true
+        buildConfig true
     }
 
     buildTypes {
@@ -78,10 +79,17 @@ dependencies {
     implementation "io.ktor:ktor-client-okhttp:$ktorVersion"
     implementation "io.ktor:ktor-client-content-negotiation:$ktorVersion"
     implementation "io.ktor:ktor-serialization-kotlinx-json:$ktorVersion"
+    implementation "io.ktor:ktor-client-logging:$ktorVersion"
 
     implementation "androidx.room:room-runtime:$roomVersion"
     ksp "androidx.room:room-compiler:$roomVersion"
     implementation "androidx.room:room-ktx:$roomVersion"
+
+    implementation "io.github.oshai:kotlin-logging-jvm:8.0.01"
+    implementation "com.github.tony19:logback-android:3.0.0"
+    implementation("org.slf4j:slf4j-api:2.0.17") {
+        exclude group: "org.slf4j", module: "slf4j-api"
+    }
 
     testImplementation "junit:junit:4.13.2"
     testImplementation "org.mockito.kotlin:mockito-kotlin:6.3.0"
