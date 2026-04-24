@@ -34,20 +34,16 @@ class PlaylistPreparation(
                 launch {
                     var attemptCount = 0
                     do {
-                        var isSavedSuccessfully = true
-
                         try {
                             localCreativeRepository.saveCreativeLocally(creative)
-                        } catch (_: Exception) {
-                            ensureActive()
-                            isSavedSuccessfully = false
-                        }
-
-                        if (!isSavedSuccessfully) {
+                            break
+                        } catch (e: Exception) {
+                            if (++attemptCount >= 3) {
+                                throw e
+                            }
                             delay(5.seconds)
-                            attemptCount++
                         }
-                    } while (!isSavedSuccessfully || attemptCount > 3)
+                    } while (true)
                 }
             }
         }
