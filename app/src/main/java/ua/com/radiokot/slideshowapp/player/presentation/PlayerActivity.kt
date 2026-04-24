@@ -15,6 +15,7 @@ import com.skydoves.landscapist.image.LocalLandscapist
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import ua.com.radiokot.slideshowapp.session.data.UserSessionScope
 
 class PlayerActivity : ComponentActivity() {
 
@@ -27,24 +28,26 @@ class PlayerActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val viewModel: PlayerScreenViewModel = koinViewModel {
-                parametersOf(
-                    PlayerScreenViewModel.Parameters(
-                        playlistKey = intent.getStringExtra(PLAYLIST_KEY_EXTRA)
-                            ?: error("No $PLAYLIST_KEY_EXTRA extra passed"),
+            UserSessionScope {
+                val viewModel: PlayerScreenViewModel = koinViewModel {
+                    parametersOf(
+                        PlayerScreenViewModel.Parameters(
+                            playlistKey = intent.getStringExtra(PLAYLIST_KEY_EXTRA)
+                                ?: error("No $PLAYLIST_KEY_EXTRA extra passed"),
+                        )
                     )
-                )
-            }
+                }
 
-            CompositionLocalProvider(
-                LocalLandscapist provides koinInject()
-            ) {
-                PlayerScreen(
-                    itemState = viewModel.playerItem.collectAsState(),
-                    onSkipCurrentItemAction = viewModel::onSkipCurrentItemAction,
-                    modifier = Modifier
-                        .fillMaxSize()
-                )
+                CompositionLocalProvider(
+                    LocalLandscapist provides koinInject()
+                ) {
+                    PlayerScreen(
+                        itemState = viewModel.playerItem.collectAsState(),
+                        onSkipCurrentItemAction = viewModel::onSkipCurrentItemAction,
+                        modifier = Modifier
+                            .fillMaxSize()
+                    )
+                }
             }
         }
 

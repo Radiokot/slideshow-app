@@ -12,6 +12,8 @@ import ua.com.radiokot.slideshowapp.playlist.domain.PlaylistPreparation
 import ua.com.radiokot.slideshowapp.playlist.domain.PlaylistRepository
 import ua.com.radiokot.slideshowapp.playlist.presentation.PlaylistPreparationScreenViewModel
 import ua.com.radiokot.slideshowapp.playlist.presentation.PlaylistsScreenViewModel
+import ua.com.radiokot.slideshowapp.session.data.userSessionScope
+import ua.com.radiokot.slideshowapp.session.domain.UserSession
 import kotlin.time.Duration.Companion.minutes
 
 val playlistModule = module {
@@ -22,35 +24,37 @@ val playlistModule = module {
         creativeModule,
     )
 
-    single {
-        CachedPlaylistRepository(
-            screenKey = "7d47b6d7-8294-4b33-8887-066961d79993",
-            playerBackend = get(),
-            playlistDao = get<ScreenDatabase>().playlists(),
-            periodicBackendUpdateInterval = 1.minutes,
-        )
-    } bind PlaylistRepository::class
+    userSessionScope {
+        scoped {
+            CachedPlaylistRepository(
+                screenKey = get<UserSession>().screenKey,
+                playerBackend = get(),
+                playlistDao = get<ScreenDatabase>().playlists(),
+                periodicBackendUpdateInterval = 1.minutes,
+            )
+        } bind PlaylistRepository::class
 
-    single {
-        PlaylistPreparation(
-            playlistRepository = get(),
-            localCreativeRepository = get(),
-        )
-    }
+        scoped {
+            PlaylistPreparation(
+                playlistRepository = get(),
+                localCreativeRepository = get(),
+            )
+        }
 
-    viewModel {
-        PlaylistsScreenViewModel(
-            screenKey = "7d47b6d7-8294-4b33-8887-066961d79993",
-            playlistRepository = get(),
-        )
-    }
+        viewModel {
+            PlaylistsScreenViewModel(
+                screenKey = get<UserSession>().screenKey,
+                playlistRepository = get(),
+            )
+        }
 
-    viewModel {
-        PlaylistPreparationScreenViewModel(
-            playlistRepository = get(),
-            playlistPreparation = get(),
-            parameters = getOrNull()
-                ?: error("No PlaylistPreparationScreenViewModel.Parameters provided"),
-        )
+        viewModel {
+            PlaylistPreparationScreenViewModel(
+                playlistRepository = get(),
+                playlistPreparation = get(),
+                parameters = getOrNull()
+                    ?: error("No PlaylistPreparationScreenViewModel.Parameters provided"),
+            )
+        }
     }
 }

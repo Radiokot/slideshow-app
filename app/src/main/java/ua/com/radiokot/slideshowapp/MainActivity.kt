@@ -28,6 +28,7 @@ import ua.com.radiokot.slideshowapp.playlist.presentation.PlaylistPreparationScr
 import ua.com.radiokot.slideshowapp.playlist.presentation.PlaylistPreparationScreenViewModel
 import ua.com.radiokot.slideshowapp.playlist.presentation.PlaylistsScreen
 import ua.com.radiokot.slideshowapp.playlist.presentation.PlaylistsScreenViewModel
+import ua.com.radiokot.slideshowapp.session.data.UserSessionScope
 
 class MainActivity : ComponentActivity() {
 
@@ -41,11 +42,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            MainNavHost(
-                onProceedToPlayer = ::openPlayer,
-                modifier = Modifier
-                    .fillMaxSize()
-            )
+            UserSessionScope {
+                MainNavHost(
+                    onProceedToPlayer = ::openPlayer,
+                    modifier = Modifier
+                        .fillMaxSize()
+                )
+            }
         }
     }
 

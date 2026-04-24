@@ -5,6 +5,7 @@ import org.koin.dsl.module
 import ua.com.radiokot.slideshowapp.creative.creativeModule
 import ua.com.radiokot.slideshowapp.player.presentation.PlayerScreenViewModel
 import ua.com.radiokot.slideshowapp.playlist.playlistModule
+import ua.com.radiokot.slideshowapp.session.data.userSessionScope
 
 val playerModule = module {
 
@@ -13,13 +14,15 @@ val playerModule = module {
         creativeModule,
     )
 
-    viewModel {
-        PlayerScreenViewModel(
-            playlistRepository = get(),
-            localCreativeRepository = get(),
-            playlistPreparation = get(),
-            parameters = getOrNull()
-                ?: error("No PlayerScreenViewModel.Parameters provided"),
-        )
+    userSessionScope {
+        viewModel {
+            PlayerScreenViewModel(
+                playlistRepository = get(),
+                localCreativeRepository = get(),
+                playlistPreparation = get(),
+                parameters = getOrNull()
+                    ?: error("No PlayerScreenViewModel.Parameters provided"),
+            )
+        }
     }
 }
