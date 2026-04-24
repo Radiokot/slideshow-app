@@ -30,6 +30,8 @@
             android:screenOrientation="sensorLandscape"
             android:theme="@style/PlayerTheme"
             tools:ignore="DiscouragedApi" />
+
+        <activity android:name=".session.presentation.SignInActivity" />
     </application>
 
 </manifest>

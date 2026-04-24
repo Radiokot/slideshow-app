@@ -4,8 +4,8 @@ import androidx.room.Room
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import ua.com.radiokot.slideshowapp.database.data.ScreenDatabase
-import ua.com.radiokot.slideshowapp.session.data.userSessionScope
 import ua.com.radiokot.slideshowapp.session.domain.UserSession
+import ua.com.radiokot.slideshowapp.session.util.userSessionScope
 
 val databaseModule = module {
 

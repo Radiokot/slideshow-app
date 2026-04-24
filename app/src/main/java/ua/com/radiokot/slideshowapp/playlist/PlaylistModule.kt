@@ -12,8 +12,9 @@ import ua.com.radiokot.slideshowapp.playlist.domain.PlaylistPreparation
 import ua.com.radiokot.slideshowapp.playlist.domain.PlaylistRepository
 import ua.com.radiokot.slideshowapp.playlist.presentation.PlaylistPreparationScreenViewModel
 import ua.com.radiokot.slideshowapp.playlist.presentation.PlaylistsScreenViewModel
-import ua.com.radiokot.slideshowapp.session.data.userSessionScope
 import ua.com.radiokot.slideshowapp.session.domain.UserSession
+import ua.com.radiokot.slideshowapp.session.sessionModule
+import ua.com.radiokot.slideshowapp.session.util.userSessionScope
 import kotlin.time.Duration.Companion.minutes
 
 val playlistModule = module {
@@ -22,6 +23,7 @@ val playlistModule = module {
         backendModule,
         databaseModule,
         creativeModule,
+        sessionModule,
     )
 
     userSessionScope {
@@ -44,6 +46,7 @@ val playlistModule = module {
         viewModel {
             PlaylistsScreenViewModel(
                 screenKey = get<UserSession>().screenKey,
+                signOutUseCase = get(),
                 playlistRepository = get(),
             )
         }

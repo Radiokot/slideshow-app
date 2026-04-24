@@ -21,6 +21,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import org.koin.android.ext.android.get
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import ua.com.radiokot.slideshowapp.player.presentation.PlayerActivity
@@ -28,7 +29,9 @@ import ua.com.radiokot.slideshowapp.playlist.presentation.PlaylistPreparationScr
 import ua.com.radiokot.slideshowapp.playlist.presentation.PlaylistPreparationScreenViewModel
 import ua.com.radiokot.slideshowapp.playlist.presentation.PlaylistsScreen
 import ua.com.radiokot.slideshowapp.playlist.presentation.PlaylistsScreenViewModel
-import ua.com.radiokot.slideshowapp.session.data.UserSessionScope
+import ua.com.radiokot.slideshowapp.session.domain.UserSessionHolder
+import ua.com.radiokot.slideshowapp.session.presentation.SignInActivity
+import ua.com.radiokot.slideshowapp.session.util.UserSessionScope
 
 class MainActivity : ComponentActivity() {
 
@@ -41,10 +44,16 @@ class MainActivity : ComponentActivity() {
         }
         super.onCreate(savedInstanceState)
 
+        if (!get<UserSessionHolder>().isSet) {
+            goToScreenSetup()
+            return
+        }
+
         setContent {
             UserSessionScope {
                 MainNavHost(
                     onProceedToPlayer = ::openPlayer,
+                    onSignedOut = ::goToScreenSetup,
                     modifier = Modifier
                         .fillMaxSize()
                 )
@@ -64,12 +73,18 @@ class MainActivity : ComponentActivity() {
                 )
         startActivity(playerIntent)
     }
+
+    private fun goToScreenSetup() {
+        startActivity(Intent(this, SignInActivity::class.java))
+        finish()
+    }
 }
 
 @Composable
 private fun MainNavHost(
     modifier: Modifier = Modifier,
     onProceedToPlayer: (playlistKey: String) -> Unit,
+    onSignedOut: () -> Unit,
 ) {
     val navController = rememberNavController()
 
@@ -89,7 +104,7 @@ private fun MainNavHost(
                 screenKey = viewModel.screenKey,
                 itemsState = viewModel.items.collectAsState(),
                 onItemClick = viewModel::onItemClick,
-                onSignOutAction = {},
+                onSignOutAction = viewModel::onSignOutAction,
                 modifier = Modifier
                     .fillMaxSize()
             )
@@ -108,6 +123,10 @@ private fun MainNavHost(
                                     playlistKey = event.playlistKey,
                                 )
                             )
+                        }
+
+                        is PlaylistsScreenViewModel.Event.SignedOut -> {
+                            onSignedOut()
                         }
                     }
                 }

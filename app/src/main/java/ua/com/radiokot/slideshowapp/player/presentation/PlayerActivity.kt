@@ -15,7 +15,7 @@ import com.skydoves.landscapist.image.LocalLandscapist
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
-import ua.com.radiokot.slideshowapp.session.data.UserSessionScope
+import ua.com.radiokot.slideshowapp.session.util.UserSessionScope
 
 class PlayerActivity : ComponentActivity() {
 

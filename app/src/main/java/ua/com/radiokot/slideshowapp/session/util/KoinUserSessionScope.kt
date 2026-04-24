@@ -1,4 +1,4 @@
-package ua.com.radiokot.slideshowapp.session.data
+package ua.com.radiokot.slideshowapp.session.util
 
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
@@ -9,41 +9,14 @@ import org.koin.androidx.scope.createActivityScope
 import org.koin.androidx.scope.createFragmentScope
 import org.koin.compose.ComposeContextWrapper
 import org.koin.compose.LocalKoinScopeContext
-import org.koin.core.Koin
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.core.annotation.KoinInternalApi
 import org.koin.core.module.Module
-import org.koin.core.qualifier._q
 import org.koin.core.scope.Scope
 import org.koin.dsl.ScopeDSL
 import org.koin.mp.KoinPlatform
+import ua.com.radiokot.slideshowapp.session.domain.DI_SCOPE_SESSION
 import ua.com.radiokot.slideshowapp.session.domain.UserSession
-import ua.com.radiokot.slideshowapp.session.domain.UserSessionHolder
-
-const val DI_SCOPE_SESSION = "user-session"
-
-class KoinScopeUserSessionHolder(
-    private val koin: Koin,
-) : UserSessionHolder {
-
-    override fun set(session: UserSession): Unit = with(koin) {
-        closeExistingScope()
-
-        createScope(
-            scopeId = DI_SCOPE_SESSION,
-            qualifier = _q<UserSession>(),
-            source = session,
-        )
-    }
-
-    override fun clear() {
-        closeExistingScope()
-    }
-
-    private fun closeExistingScope() = with(koin) {
-        getScopeOrNull(DI_SCOPE_SESSION)?.close()
-    }
-}
 
 /**
  * @return Activity [Scope] linked to the [UserSession] scope, if it exists.

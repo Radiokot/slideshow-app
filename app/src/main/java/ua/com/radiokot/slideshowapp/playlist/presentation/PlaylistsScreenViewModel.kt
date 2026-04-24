@@ -16,12 +16,14 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.runBlocking
 import ua.com.radiokot.slideshowapp.playlist.domain.PlaylistRepository
+import ua.com.radiokot.slideshowapp.session.domain.SignOutUseCase
 import ua.com.radiokot.slideshowapp.util.eventSharedFlow
 import java.time.ZoneId
 
 @Immutable
 class PlaylistsScreenViewModel(
     val screenKey: String,
+    private val signOutUseCase: SignOutUseCase,
     private val playlistRepository: PlaylistRepository,
 ) : ViewModel() {
 
@@ -70,6 +72,11 @@ class PlaylistsScreenViewModel(
         }
     }
 
+    fun onSignOutAction() {
+        signOutUseCase()
+        _events.tryEmit(Event.SignedOut)
+    }
+
     sealed interface Event {
         class ProceedToPlayer(
             val playlistKey: String,
@@ -78,5 +85,7 @@ class PlaylistsScreenViewModel(
         class ProceedToPlaylistPreparation(
             val playlistKey: String,
         ) : Event
+
+        object SignedOut : Event
     }
 }
