@@ -17,7 +17,7 @@ val creativeModule = module {
 
     single(named(DIRECTORY_CREATIVES)) {
         File(
-            androidContext().cacheDir,
+            androidContext().noBackupFilesDir,
             "Creatives"
         ).apply {
             if (!exists()) {

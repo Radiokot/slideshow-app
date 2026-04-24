@@ -6,10 +6,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.skydoves.landscapist.image.LocalLandscapist
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -33,12 +36,16 @@ class PlayerActivity : ComponentActivity() {
                 )
             }
 
-            PlayerScreen(
-                itemState = viewModel.playerItem.collectAsState(),
-                onSkipCurrentItemAction = viewModel::onSkipCurrentItemAction,
-                modifier = Modifier
-                    .fillMaxSize()
-            )
+            CompositionLocalProvider(
+                LocalLandscapist provides koinInject()
+            ) {
+                PlayerScreen(
+                    itemState = viewModel.playerItem.collectAsState(),
+                    onSkipCurrentItemAction = viewModel::onSkipCurrentItemAction,
+                    modifier = Modifier
+                        .fillMaxSize()
+                )
+            }
         }
 
         WindowInsetsControllerCompat(window, window.decorView)

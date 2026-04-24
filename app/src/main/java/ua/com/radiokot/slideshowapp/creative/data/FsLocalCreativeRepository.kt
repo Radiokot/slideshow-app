@@ -36,12 +36,14 @@ class FsLocalCreativeRepository(
         creative: Creative,
     ): Uri? = withContext(Dispatchers.IO) {
 
-        getCreativeFile(
-            creativeKey = creative.key,
-        )
-            .takeIf(File::exists)
-            ?.absolutePath
-            ?.toUri()
+        val file =
+            getCreativeFile(
+                creativeKey = creative.key,
+            )
+                .takeIf(File::exists)
+                ?: return@withContext null
+
+        "file://${file.absolutePath}".toUri()
     }
 
     override suspend fun saveCreativeLocally(

@@ -2,7 +2,7 @@ package ua.com.radiokot.slideshowapp.database.data
 
 import ua.com.radiokot.slideshowapp.playlist.domain.Playlist
 import java.time.Instant
-import kotlin.time.Duration.Companion.microseconds
+import kotlin.time.Duration.Companion.milliseconds
 
 fun PlaylistDbEntity(
     source: Playlist,
@@ -27,7 +27,7 @@ fun PlaylistDbEntity.toPlaylist() = Playlist(
     isReadyToPlay = isReadyToPlay,
     items = items.map { dbItem ->
         Playlist.Item(
-            duration = dbItem.durationMs.microseconds,
+            duration = dbItem.durationMs.milliseconds,
             orderKey = dbItem.orderKey,
             creative = ua.com.radiokot.slideshowapp.creative.domain.Creative(
                 key = dbItem.creativeKey,

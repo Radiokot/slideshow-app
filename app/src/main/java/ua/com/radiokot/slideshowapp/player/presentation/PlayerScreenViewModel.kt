@@ -3,7 +3,6 @@
 package ua.com.radiokot.slideshowapp.player.presentation
 
 import androidx.compose.runtime.Immutable
-import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -12,7 +11,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -20,12 +18,16 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.runBlocking
+import ua.com.radiokot.slideshowapp.creative.domain.Creative
+import ua.com.radiokot.slideshowapp.creative.domain.LocalCreativeRepository
 import ua.com.radiokot.slideshowapp.playlist.domain.Playlist
 import ua.com.radiokot.slideshowapp.playlist.domain.PlaylistRepository
+import ua.com.radiokot.slideshowapp.util.coroutineScopeThatCancelsWith
 
 @Immutable
 class PlayerScreenViewModel(
     private val playlistRepository: PlaylistRepository,
+    private val localCreativeRepository: LocalCreativeRepository,
     private val parameters: Parameters,
 ) : ViewModel() {
 
@@ -43,53 +45,64 @@ class PlayerScreenViewModel(
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
 
-    val playerItem: StateFlow<PlayerItem?> =
+    val playerItem: StateFlow<PlayerItem?> = runBlocking {
         playlist
             .flatMapLatest(::createPlayerItemFlow)
-            .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+            .stateIn(coroutineScopeThatCancelsWith(viewModelScope))
+    }
 
-    private fun createPlayerItemFlow(
+    private suspend fun createPlayerItemFlow(
         playlist: Playlist,
     ): Flow<PlayerItem?> {
 
-        // TODO use actual items.
-        val items = listOf(
-            PlayerItem(
-                key = "1",
-                content = PlayerItem.Content.Image(
-                    uri = "https://picsum.photos/720".toUri(),
-                )
-            ),
-            PlayerItem(
-                key = "2",
-                content = PlayerItem.Content.Video(
-                    uri = "https://radiokot.com.ua/Radiokot/rock_cat.mp4".toUri(),
-                    volumePercent = 100f,
-                )
-            ),
-            null,
-        )
+        val playlistItems =
+            playlist
+                .items
+                .sortedBy(Playlist.Item::orderKey)
+
+        val playerItems =
+            playlistItems
+                .map { item ->
+                    val localCreativeUri =
+                        localCreativeRepository.getLocalCreativeUri(item.creative)
+                            ?: error("Missing creative locally: ${item.creative}")
+
+                    PlayerItem(
+                        key = "${item.creative.key}_${item.orderKey}",
+                        content = when (item.creative.contentType) {
+
+                            Creative.Type.Image ->
+                                PlayerItem.Content.Image(
+                                    uri = localCreativeUri,
+                                )
+
+                            Creative.Type.Video -> {
+                                PlayerItem.Content.Video(
+                                    uri = localCreativeUri,
+                                    volumePercent = item.creative.soundVolumePercent ?: 100f,
+                                )
+                            }
+                        },
+                    )
+                }
 
         return flow {
             var currentItemIndex = 0
             do {
-                val currentItem = items.getOrNull(currentItemIndex)
+                val currentItem = playerItems.getOrNull(currentItemIndex)
                 emit(currentItem)
-
-                // TODO use the actual duration
-                val presentationDuration = 20000L
 
                 // Wait either for the presentation to finish
                 // or for the user to skip the current item.
                 merge(
                     flow {
-                        delay(presentationDuration)
+                        delay(playlistItems[currentItemIndex].duration)
                         emit(Unit)
                     },
                     skipCurrentItemAction,
                 ).first()
 
-                currentItemIndex = (currentItemIndex + 1) % items.size
+                currentItemIndex = (currentItemIndex + 1) % playerItems.size
             } while (true)
         }
     }
