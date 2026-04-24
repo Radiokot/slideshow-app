@@ -33,8 +33,13 @@ interface PlaylistDao {
         keys: List<String>,
     )
 
-    @Query("SELECT * FROM playlists WHERE `key`=:key AND is_ready=1")
+    @Query("SELECT * FROM playlists WHERE `key`=:key AND is_ready=1 AND last_modified=(SELECT MAX(last_modified) FROM playlists WHERE `key`=:key)")
     suspend fun selectReadyToPlayPlaylist(
+        key: String,
+    ): PlaylistDbEntity?
+
+    @Query("SELECT * FROM playlists WHERE `key`=:key AND last_modified=(SELECT MAX(last_modified) FROM playlists WHERE `key`=:key)")
+    suspend fun selectMostRecentPlaylist(
         key: String,
     ): PlaylistDbEntity?
 }

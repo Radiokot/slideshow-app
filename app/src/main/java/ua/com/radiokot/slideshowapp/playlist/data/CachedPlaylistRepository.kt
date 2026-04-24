@@ -4,13 +4,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onSubscription
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import ua.com.radiokot.slideshowapp.backend.data.PlayerBackend
 import ua.com.radiokot.slideshowapp.backend.data.toPlaylists
@@ -19,11 +22,14 @@ import ua.com.radiokot.slideshowapp.database.data.PlaylistDbEntity
 import ua.com.radiokot.slideshowapp.database.data.toPlaylist
 import ua.com.radiokot.slideshowapp.playlist.domain.Playlist
 import ua.com.radiokot.slideshowapp.playlist.domain.PlaylistRepository
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 class CachedPlaylistRepository(
     private val screenKey: String,
     private val playerBackend: PlayerBackend,
     private val playlistDao: PlaylistDao,
+    private val periodicBackendUpdateInterval: Duration,
 ) : PlaylistRepository {
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -37,7 +43,9 @@ class CachedPlaylistRepository(
             )
             ?.let(PlaylistDbEntity::toPlaylist)
 
-    private val sharedMostRecentPlaylistsFlow: SharedFlow<List<Playlist>> =
+    private var periodicBackendUpdatesJob: Job? = null
+
+    private val mostRecentPlaylistsFlowWithUpdates: SharedFlow<List<Playlist>> =
         playlistDao
             .selectAllPlaylistsFlow()
             .map { dbEntities ->
@@ -49,26 +57,36 @@ class CachedPlaylistRepository(
                             .toPlaylist()
                     }
             }
-            .shareIn(coroutineScope, SharingStarted.Eagerly, replay = 1)
-
-    private var updateFromBackendJob: Job? = null
-
-    override fun getMostRecentPlaylistsFlow(): Flow<List<Playlist>> =
-        sharedMostRecentPlaylistsFlow
-            .onSubscription {
-                if (updateFromBackendJob?.isActive != true) {
-                    updateFromBackendJob = coroutineScope.launch {
+            .onStart {
+                periodicBackendUpdatesJob = coroutineScope.launch {
+                    do {
                         updatePlaylistsFromBackend()
-                    }
+                        delay(periodicBackendUpdateInterval)
+                    } while (isActive)
                 }
             }
+            .onCompletion {
+                periodicBackendUpdatesJob?.cancel()
+            }
+            .shareIn(
+                scope = coroutineScope,
+                started = SharingStarted.WhileSubscribed(
+                    stopTimeout = 10.seconds,
+                ),
+                replay = 1,
+            )
+
+    override fun getMostRecentPlaylistsFlow(): Flow<List<Playlist>> =
+        mostRecentPlaylistsFlowWithUpdates
 
     override suspend fun getMostRecentPlaylist(
         key: String,
     ): Playlist? =
-        sharedMostRecentPlaylistsFlow
-            .first()
-            .find { it.key == key }
+        playlistDao
+            .selectMostRecentPlaylist(
+                key = key,
+            )
+            ?.let(PlaylistDbEntity::toPlaylist)
 
     override suspend fun setPlaylistReady(
         playlist: Playlist,
