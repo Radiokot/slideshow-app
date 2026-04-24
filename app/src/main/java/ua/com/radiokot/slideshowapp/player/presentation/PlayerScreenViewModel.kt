@@ -12,15 +12,19 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.runBlocking
 import ua.com.radiokot.slideshowapp.creative.domain.Creative
 import ua.com.radiokot.slideshowapp.creative.domain.LocalCreativeRepository
 import ua.com.radiokot.slideshowapp.playlist.domain.Playlist
+import ua.com.radiokot.slideshowapp.playlist.domain.PlaylistPreparation
 import ua.com.radiokot.slideshowapp.playlist.domain.PlaylistRepository
 import ua.com.radiokot.slideshowapp.util.coroutineScopeThatCancelsWith
 
@@ -28,6 +32,7 @@ import ua.com.radiokot.slideshowapp.util.coroutineScopeThatCancelsWith
 class PlayerScreenViewModel(
     private val playlistRepository: PlaylistRepository,
     private val localCreativeRepository: LocalCreativeRepository,
+    private val playlistPreparation: PlaylistPreparation,
     private val parameters: Parameters,
 ) : ViewModel() {
 
@@ -49,6 +54,30 @@ class PlayerScreenViewModel(
         playlist
             .flatMapLatest(::createPlayerItemFlow)
             .stateIn(coroutineScopeThatCancelsWith(viewModelScope))
+    }
+
+    init {
+        // When playlists are updated, check if there's a newer version,
+        // prepare it and start playing.
+        playlistRepository
+            .getMostRecentPlaylistsFlow()
+            .conflate()
+            .onEach { playlists ->
+                val currentPlaylist = playlist.value
+                val newerVersion = playlists.find {
+                    it.key == currentPlaylist.key
+                            && it.lastModified > currentPlaylist.lastModified
+                }
+
+                if (newerVersion != null) {
+                    val isPreparedSuccessfully =
+                        playlistPreparation.preparePlaylist(newerVersion)
+                    if (isPreparedSuccessfully) {
+                        playlist.value = newerVersion
+                    }
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
     private suspend fun createPlayerItemFlow(

@@ -17,6 +17,7 @@ val playerModule = module {
         PlayerScreenViewModel(
             playlistRepository = get(),
             localCreativeRepository = get(),
+            playlistPreparation = get(),
             parameters = getOrNull()
                 ?: error("No PlayerScreenViewModel.Parameters provided"),
         )

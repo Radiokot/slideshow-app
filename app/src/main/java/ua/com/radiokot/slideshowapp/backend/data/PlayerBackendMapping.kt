@@ -1,7 +1,7 @@
 package ua.com.radiokot.slideshowapp.backend.data
 
-import ua.com.radiokot.slideshowapp.creative.domain.Creative
 import ua.com.radiokot.slideshowapp.backend.data.PlayerBackend.PlaylistItem
+import ua.com.radiokot.slideshowapp.creative.domain.Creative
 import ua.com.radiokot.slideshowapp.playlist.domain.Playlist
 import java.time.Instant
 import kotlin.time.Duration.Companion.seconds
