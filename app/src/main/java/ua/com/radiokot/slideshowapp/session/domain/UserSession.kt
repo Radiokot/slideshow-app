@@ -1,5 +1,5 @@
 package ua.com.radiokot.slideshowapp.session.domain
 
-class UserSession(
+data class UserSession(
     val screenKey: String,
 )
