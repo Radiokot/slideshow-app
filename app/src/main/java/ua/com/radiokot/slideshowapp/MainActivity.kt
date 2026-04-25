@@ -2,9 +2,9 @@ package ua.com.radiokot.slideshowapp
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.fadeIn
@@ -35,8 +35,9 @@ import ua.com.radiokot.slideshowapp.session.util.UserSessionScope
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
-        window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+        enableEdgeToEdge(
+            navigationBarStyle = SystemBarStyle.light(0, 0),
+        )
         super.onCreate(savedInstanceState)
 
         if (!get<UserSessionHolder>().isSet) {

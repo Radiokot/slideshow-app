@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
@@ -112,6 +113,7 @@ fun SignInScreen(
                 onKeyboardAction = {
                     onGoAction()
                 },
+                lineLimits = TextFieldLineLimits.SingleLine,
                 modifier = Modifier
                     .focusRequester(inputFocusRequester)
                     .fillMaxWidth()

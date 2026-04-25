@@ -30,7 +30,9 @@
             android:theme="@style/PlayerTheme"
             tools:ignore="DiscouragedApi" />
 
-        <activity android:name=".session.presentation.SignInActivity" />
+        <activity
+            android:name=".session.presentation.SignInActivity"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

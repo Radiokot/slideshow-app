@@ -2,8 +2,8 @@ package ua.com.radiokot.slideshowapp.session.presentation
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.WindowManager
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,8 +16,9 @@ import ua.com.radiokot.slideshowapp.MainActivity
 class SignInActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
-        window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+        enableEdgeToEdge(
+            navigationBarStyle = SystemBarStyle.light(0, 0),
+        )
         super.onCreate(savedInstanceState)
 
         setContent {
