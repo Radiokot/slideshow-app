@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,7 +39,7 @@ fun PlaylistPreparationScreen(
     verticalArrangement = Arrangement.Center,
     horizontalAlignment = Alignment.CenterHorizontally,
     modifier = modifier
-        .background(Color(0xffda1d52))
+        .background(Color(0xFFD98AB2))
         .safeContentPadding()
         .padding(24.dp)
 ) {
@@ -59,9 +60,9 @@ fun PlaylistPreparationScreen(
     )
 
     Image(
-        painter = painterResource(R.drawable.ic_cloud_download),
+        painter = painterResource(R.drawable.ic_download),
         contentDescription = "Loading indicator",
-        colorFilter = ColorFilter.tint(Color.White),
+        colorFilter = ColorFilter.tint(Color(0xff260211)),
         modifier = Modifier
             .size(64.dp)
             .graphicsLayer {
@@ -73,21 +74,22 @@ fun PlaylistPreparationScreen(
         text = "Preparing the playlist",
         style = TextStyle(
             textAlign = TextAlign.Center,
-            color = Color.White,
+            color = Color(0xff260211),
             fontWeight = FontWeight.Bold,
+            fontFamily = FontFamily.Monospace,
             fontSize = 18.sp,
         ),
         modifier = Modifier
             .padding(
-                top = 24.dp,
+                top = 40.dp,
             )
     )
 
     BasicText(
-        text = "Playback will start once the content is downloaded",
+        text = "Playback will start soon",
         style = TextStyle(
             textAlign = TextAlign.Center,
-            color = Color.White,
+            color = Color(0xff260211),
             fontSize = 14.sp,
         ),
         modifier = Modifier

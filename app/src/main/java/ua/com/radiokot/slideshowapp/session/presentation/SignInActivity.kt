@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.core.view.WindowInsetsControllerCompat
 import org.koin.compose.viewmodel.koinViewModel
 import ua.com.radiokot.slideshowapp.MainActivity
 
@@ -19,10 +18,6 @@ class SignInActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
-        with(WindowInsetsControllerCompat(window, window.decorView)) {
-            isAppearanceLightStatusBars = false
-            isAppearanceLightNavigationBars = false
-        }
         super.onCreate(savedInstanceState)
 
         setContent {

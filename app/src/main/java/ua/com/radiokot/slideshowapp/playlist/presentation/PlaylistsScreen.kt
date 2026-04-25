@@ -24,7 +24,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,7 +46,7 @@ fun PlaylistsScreen(
     onSignOutAction: () -> Unit,
 ) = Column(
     modifier = modifier
-        .background(Color(0xffda1d52))
+        .background(Color(0xFFD98AB2))
         .safeContentPadding()
         .padding(24.dp),
 ) {
@@ -56,15 +58,16 @@ fun PlaylistsScreen(
             BasicText(
                 text = "Screen",
                 style = TextStyle(
-                    color = Color.White,
+                    color = Color(0xff260211),
                     fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.Monospace,
                     fontSize = 18.sp,
                 )
             )
             BasicText(
                 text = screenKey,
                 style = TextStyle(
-                    color = Color.White,
+                    color = Color(0xff260211),
                     fontSize = 14.sp,
                 ),
                 modifier = Modifier
@@ -77,7 +80,7 @@ fun PlaylistsScreen(
         Image(
             painter = painterResource(R.drawable.ic_logout),
             contentDescription = "Sign out",
-            colorFilter = ColorFilter.tint(Color.White),
+            colorFilter = ColorFilter.tint(Color(0xff260211)),
             modifier = Modifier
                 .offset(
                     x = 8.dp,
@@ -92,13 +95,14 @@ fun PlaylistsScreen(
     BasicText(
         text = "Playlists",
         style = TextStyle(
-            color = Color.White,
+            color = Color(0xff260211),
             fontWeight = FontWeight.Bold,
             fontSize = 18.sp,
+            fontFamily = FontFamily.Monospace,
         ),
         modifier = Modifier
             .padding(
-                top = 32.dp,
+                top = 40.dp,
             )
     )
 
@@ -126,8 +130,8 @@ fun PlaylistsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .border(
-                        width = 1.dp,
-                        color = Color.White,
+                        width = 2.dp,
+                        color = Color(0xff260211),
                     )
                     .clickable(
                         onClick = {
@@ -139,16 +143,19 @@ fun PlaylistsScreen(
                 BasicText(
                     text = item.key,
                     style = TextStyle(
-                        color = Color.White,
-                        fontSize = 14.sp,
+                        color = Color(0xff260211),
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                    )
+                        fontFamily = FontFamily.Monospace,
+                    ),
+                    maxLines = 1,
+                    overflow = TextOverflow.MiddleEllipsis,
                 )
 
                 BasicText(
                     text = "Last modified: ${dateTimeFormat.format(item.lastModified)}",
                     style = TextStyle(
-                        color = Color.White,
+                        color = Color(0xff260211),
                         fontSize = 14.sp,
                     ),
                     modifier = Modifier

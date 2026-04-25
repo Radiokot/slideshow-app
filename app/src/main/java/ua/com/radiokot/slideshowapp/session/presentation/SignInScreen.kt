@@ -27,6 +27,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -44,7 +45,7 @@ fun SignInScreen(
     verticalArrangement = Arrangement.Center,
     horizontalAlignment = Alignment.CenterHorizontally,
     modifier = modifier
-        .background(Color(0xffda1d52))
+        .background(Color(0xFFD98AB2))
         .safeContentPadding()
         .padding(24.dp)
 ) {
@@ -52,8 +53,9 @@ fun SignInScreen(
         text = "Screen setup",
         style = TextStyle(
             textAlign = TextAlign.Center,
-            color = Color.White,
+            color = Color(0xff260211),
             fontWeight = FontWeight.Bold,
+            fontFamily = FontFamily.Monospace,
             fontSize = 18.sp,
         ),
     )
@@ -62,11 +64,11 @@ fun SignInScreen(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .padding(
-                top = 24.dp,
+                top = 40.dp,
             )
             .border(
-                width = 1.dp,
-                color = Color.White,
+                width = 2.dp,
+                color = Color(0xff260211),
             )
             .padding(16.dp)
             .fillMaxWidth()
@@ -76,7 +78,7 @@ fun SignInScreen(
                 text = "Enter the screen key",
                 style = TextStyle(
                     textAlign = TextAlign.Center,
-                    color = Color.White.copy(
+                    color = Color(0xff260211).copy(
                         alpha = 0.6f,
                     ),
                     fontSize = 14.sp,
@@ -88,8 +90,8 @@ fun SignInScreen(
             remember(::FocusRequester)
 
         val textSelectionColors = TextSelectionColors(
-            handleColor = Color.White,
-            backgroundColor = Color.White.copy(alpha = 0.4f)
+            handleColor = Color(0xff260211),
+            backgroundColor = Color(0xff260211).copy(alpha = 0.4f)
         )
         CompositionLocalProvider(
             LocalTextSelectionColors provides textSelectionColors
@@ -98,10 +100,10 @@ fun SignInScreen(
                 state = keyInputState,
                 textStyle = TextStyle(
                     textAlign = TextAlign.Center,
-                    color = Color.White,
+                    color = Color(0xff260211),
                     fontSize = 14.sp,
                 ),
-                cursorBrush = SolidColor(Color.White),
+                cursorBrush = SolidColor(Color(0xff260211)),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
                     showKeyboardOnFocus = true,
@@ -112,6 +114,7 @@ fun SignInScreen(
                 },
                 modifier = Modifier
                     .focusRequester(inputFocusRequester)
+                    .fillMaxWidth()
             )
         }
 
