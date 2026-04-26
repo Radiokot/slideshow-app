@@ -23,6 +23,7 @@ interface PlayerBackend {
     @Serializable
     data class PlaylistItemsResponse(
         val playlists: List<Playlist>,
+        val modified: Long,
     )
 
     @Serializable

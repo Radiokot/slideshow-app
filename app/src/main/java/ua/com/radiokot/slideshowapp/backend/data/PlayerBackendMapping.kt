@@ -12,10 +12,10 @@ fun PlayerBackend.PlaylistItemsResponse.toPlaylists(): List<Playlist> =
             Playlist(
                 key = playlistKey,
                 lastModified =
-                    playlistItems
-                        .maxOfOrNull(PlaylistItem::modified)
-                        ?.let(Instant::ofEpochMilli)
-                        ?: Instant.ofEpochMilli(0),
+                    Instant.ofEpochMilli(
+                        playlistItems.maxOfOrNull(PlaylistItem::modified)
+                            ?: modified
+                    ),
                 items =
                     playlistItems.map { playlistItem ->
                         Playlist.Item(
